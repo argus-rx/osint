@@ -3,34 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARGUS-RX</title>
+    <title>ARGUS-RX | OSINT & Security Intelligence</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b0f14;
+            color: #e6edf3;
+            margin: 0;
+        }
+
+        header {
+            border-bottom: 1px solid #30363d;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 3px;
+        }
+
+        header p {
+            color: #8b949e;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 25px 0;
+        }
+
+        input {
+            flex: 1;
+            padding: 14px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: white;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 14px 24px;
+            background: #238636;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin: 20px 0;
+            color: #8b949e;
+        }
+
+        .result {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .result h2 {
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .item {
+            border: 1px solid #30363d;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .label {
+            color: #8b949e;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .value {
+            margin-top: 6px;
+            word-break: break-word;
+        }
+
+        .malicious {
+            color: #ff7b72;
+        }
+
+        .clean {
+            color: #3fb950;
+        }
+
+        .warning {
+            color: #d29922;
+        }
+
+        footer {
+            text-align: center;
+            border-top: 1px solid #30363d;
+            padding: 25px;
+            color: #8b949e;
+            margin-top: 80px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>ARGUS-RX</h1>
-        <p>Open Source Intelligence & Security Visibility</p>
-    </header>
+<header>
+    <h1>ARGUS-RX</h1>
+    <p>Open Source Intelligence & Security Visibility</p>
+</header>
 
-    <main>
-        <h2>OSINT Tools</h2>
+<main>
 
-        <p>
-            Intelligence and analysis tools for security operations.
-        </p>
+    <h2>IOC Intelligence</h2>
 
+    <p>
+        Analyze file hashes using VirusTotal threat intelligence.
+    </p>
+
+    <div class="search-box">
         <input
+            id="hashInput"
             type="text"
-            placeholder="Enter an IP, domain, URL, or hash"
+            placeholder="Enter MD5, SHA-1, or SHA-256"
         >
 
-        <button>Analyze</button>
-    </main>
+        <button id="analyzeBtn" onclick="analyzeHash()">
+            Analyze
+        </button>
+    </div>
 
-    <footer>
-        <p>ARGUS-RX</p>
-    </footer>
+    <div id="status"></div>
+
+    <div id="results"></div>
+
+</main>
+
+<footer>
+    <p>ARGUS-RX • Security Intelligence Platform</p>
+</footer>
+
+<script>
+
+    // Replace this with your actual Cloudflare Worker URL
+    const WORKER_URL = "https://YOUR-WORKER.workers.dev";
+
+    async function analyzeHash() {
+
+        const input = document.getElementById("hashInput");
+        const button = document.getElementById("analyzeBtn");
+        const status = document.getElementById("status");
+        const results = document.getElementById("results");
+
+        const hash = input.value.trim();
+
+        if (!hash) {
+            status.textContent = "Please enter a file hash.";
+            return;
+        }
+
+        button.disabled = true;
+        status.textContent = "Querying VirusTotal...";
+        results.innerHTML = "";
+
+        try {
+
+            const response = await fetch(
+                `${WORKER_URL}/?hash=${encodeURIComponent(hash)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error?.message ||
+                    data.error ||
+                    "VirusTotal lookup failed."
+                );
+            }
+
+            const attributes = data.data.attributes;
+
+            const stats = attributes.last_analysis_stats || {};
+
+            const malicious = stats.malicious || 0;
+            const suspicious = stats.suspicious || 0;
+            const undetected = stats.undetected || 0;
+
+            let verdict = "No malicious detections";
+
+            if (malicious > 0) {
+                verdict = "Malicious";
+            } else if (suspicious > 0) {
+                verdict = "Suspicious";
+            }
+
+            const verdictClass =
+                malicious > 0
+                    ? "malicious"
+                    : suspicious > 0
+                        ? "warning"
+                        : "clean";
+
+            results.innerHTML = `
+
+                <div class="result">
+
+                    <h2 class="${verdictClass}">
+                        ${verdict}
+                    </h2>
+
+                    <div class="grid">
+
+                        <div class="item">
+                            <div class="label">Detection</div>
+                            <div class="value">
+                                ${malicious} malicious /
+                                ${suspicious} suspicious /
+                                ${undetected} undetected
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">File Name</div>
+                            <div class="value">
+                                ${attributes.meaningful_name || "Unknown"}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">File Type</div>
+                            <div class="value">
+                                ${attributes.type_description || "Unknown"}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">Threat Classification</div>
+                            <div class="value">
+                                ${attributes.popular_threat_classification?.suggested_threat_label || "None"}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">MD5</div>
+                            <div class="value">
+                                ${attributes.md5 || "Unknown"}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">SHA-1</div>
+                            <div class="value">
+                                ${attributes.sha1 || "Unknown"}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">SHA-256</div>
+                            <div class="value">
+                                ${attributes.sha256 || hash}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">File Size</div>
+                            <div class="value">
+                                ${formatBytes(attributes.size)}
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label">Times Submitted</div>
+                            <div class="value">
+                                ${attributes.times_submitted || 0}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+
+            status.textContent = "Analysis complete.";
+
+        } catch (error) {
+
+            status.textContent = "Lookup failed.";
+            
+            results.innerHTML = `
+                <div class="result">
+                    <h3 class="malicious">Error</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+
+        } finally {
+
+            button.disabled = false;
+
+        }
+    }
+
+    function formatBytes(bytes) {
+
+        if (!bytes) return "Unknown";
+
+        const units = ["B", "KB", "MB", "GB"];
+
+        let i = 0;
+
+        while (bytes >= 1024 && i < units.length - 1) {
+            bytes /= 1024;
+            i++;
+        }
+
+        return `${bytes.toFixed(2)} ${units[i]}`;
+    }
+
+</script>
 
 </body>
 </html>
