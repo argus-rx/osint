@@ -222,6 +222,15 @@
             font-size: 10px;
         }
 
+        .link-value {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        .link-value:hover {
+            text-decoration: underline;
+        }
+
         .section-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -420,6 +429,14 @@
                 attributes.last_analysis_stats || {};
 
 
+            /*
+             * VirusTotal detection ratio:
+             *
+             * Include actual analysis results.
+             * Exclude type-unsupported because those engines
+             * did not provide a detection result.
+             */
+
             const malicious =
                 stats.malicious || 0;
 
@@ -451,7 +468,6 @@
                 undetected +
                 harmless +
                 timeout +
-                unsupported +
                 confirmedTimeout +
                 failure;
 
@@ -488,13 +504,17 @@
 
             const threat =
                 classification.suggested_threat_label ||
-                "None";
+                "Unknown";
 
 
             const category =
                 classification.category ||
-                "None";
+                "Unknown";
 
+
+            /*
+             * Signature information
+             */
 
             const signature =
                 attributes.signature_info || {};
@@ -509,6 +529,36 @@
                 signature.version ||
                 signature.file_version ||
                 "Unknown";
+
+
+            const publisher =
+                signature.signers ||
+                signature.signer ||
+                signature.publisher ||
+                "Unknown";
+
+
+            let signatureStatus =
+                "Unknown";
+
+
+            if (
+                signature.valid === true ||
+                signature.verified === true
+            ) {
+
+                signatureStatus =
+                    "Valid";
+
+            } else if (
+                signature.valid === false ||
+                signature.verified === false
+            ) {
+
+                signatureStatus =
+                    "Invalid";
+
+            }
 
 
             const meaningfulName =
@@ -530,6 +580,12 @@
                 0;
 
 
+            const vtUrl =
+                `https://www.virustotal.com/gui/file/${encodeURIComponent(
+                    data.data.id
+                )}/detection`;
+
+
             currentReport =
                 buildAnalystReport({
 
@@ -549,7 +605,12 @@
 
                     category,
                     product,
-                    version
+                    version,
+
+                    signatureStatus,
+                    publisher,
+
+                    vtUrl
 
                 });
 
@@ -578,7 +639,12 @@
                 product,
                 version,
 
+                signatureStatus,
+                publisher,
+
                 submissions,
+
+                vtUrl,
 
                 attributes
 
@@ -653,7 +719,7 @@
                         </div>
 
                         <div class="verdict ${data.verdictClass}">
-                            ${data.verdict}
+                            ${escapeHTML(data.verdict)}
                         </div>
 
                     </div>
@@ -684,7 +750,10 @@
                 </div>
 
 
-                <pre class="report" id="analystReport">${escapeHTML(currentReport)}</pre>
+                <pre
+                    class="report"
+                    id="analystReport"
+                >${escapeHTML(currentReport)}</pre>
 
             </div>
 
@@ -710,6 +779,11 @@
                     )}
 
                     ${infoItem(
+                        "Threat",
+                        data.threat
+                    )}
+
+                    ${infoItem(
                         "Size",
                         data.fileSize
                     )}
@@ -717,6 +791,41 @@
                     ${infoItem(
                         "VT Submissions",
                         data.submissions
+                    )}
+
+                </div>
+
+            </div>
+
+
+            <!-- SIGNATURE -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    <h3>Signature Information</h3>
+                </div>
+
+                <div class="grid">
+
+                    ${infoItem(
+                        "Status",
+                        data.signatureStatus
+                    )}
+
+                    ${infoItem(
+                        "Publisher",
+                        data.publisher
+                    )}
+
+                    ${infoItem(
+                        "Product",
+                        data.product
+                    )}
+
+                    ${infoItem(
+                        "Version",
+                        data.version
                     )}
 
                 </div>
@@ -754,15 +863,20 @@
             </div>
 
 
-            <!-- DETECTION -->
+            <!-- DETECTION STATISTICS -->
 
             <div class="card">
 
                 <div class="card-title">
-                    <h3>Detection Analysis</h3>
+                    <h3>Detection Statistics</h3>
                 </div>
 
                 <div class="grid">
+
+                    ${infoItem(
+                        "Detection Ratio",
+                        `${data.malicious} / ${data.totalEngines}`
+                    )}
 
                     ${infoItem(
                         "Malicious",
@@ -817,18 +931,8 @@
                     )}
 
                     ${infoItem(
-                        "Threat",
+                        "Suggested Label",
                         data.threat
-                    )}
-
-                    ${infoItem(
-                        "Product",
-                        data.product
-                    )}
-
-                    ${infoItem(
-                        "Version",
-                        data.version
                     )}
 
                 </div>
@@ -852,23 +956,69 @@
 
             </div>
 
+
+            <!-- VIRUSTOTAL -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    <h3>VirusTotal</h3>
+                </div>
+
+                <div class="grid">
+
+                    <div class="item">
+
+                        <span class="label">
+                            Report
+                        </span>
+
+                        <span class="value">
+
+                            <a
+                                class="link-value"
+                                href="${escapeHTML(data.vtUrl)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Open Detection Report
+                            </a>
+
+                        </span>
+
+                    </div>
+
+                    ${infoItem(
+                        "Source",
+                        "VirusTotal"
+                    )}
+
+                </div>
+
+            </div>
+
         `;
     }
 
 
     function buildAnalystReport(data) {
 
-        return `ARGUS-RX — VIRUSTOTAL IOC REPORT
+        return `================================
+       VIRUSTOTAL SUMMARY
 ================================
 
 VERDICT: ${data.verdict}
-DETECTION: ${data.malicious} / ${data.totalEngines} engines
+DETECTION: ${data.malicious} / ${data.totalEngines} ENGINES
 
-FILE
+FILE INFORMATION
 Name: ${data.meaningfulName}
 Type: ${data.fileType}
 Threat: ${data.threat}
 Size: ${data.fileSize}
+
+SIGNATURE INFORMATION
+Status: ${data.signatureStatus}
+Publisher: ${data.publisher}
 
 HASHES
 MD5: ${data.attributes.md5 || "Unknown"}
@@ -877,6 +1027,7 @@ SHA-256: ${data.attributes.sha256 || "Unknown"}
 
 VT SUBMISSIONS: ${data.submissions}
 SOURCE: VirusTotal
+${data.vtUrl}
 
 ----------------------
 OTHER INTELLIGENCE
@@ -886,11 +1037,7 @@ THREAT CLASSIFICATION
 Category: ${data.category}
 Suggested Label: ${data.threat}
 
-FILE DETAILS
-Product: ${data.product}
-Version: ${data.version}
-
-REPUTATION
+DETECTION STATISTICS
 Malicious: ${data.malicious}
 Suspicious: ${data.suspicious}
 Undetected: ${data.undetected}`;
@@ -1065,7 +1212,11 @@ Undetected: ${data.undetected}`;
 
     function formatBytes(bytes) {
 
-        if (!bytes) {
+        if (
+            bytes === null ||
+            bytes === undefined ||
+            bytes === 0
+        ) {
             return "Unknown";
         }
 
