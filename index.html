@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ARGUS-RX | OSINT & Security Intelligence</title>
+    <title>ARGUS-RX | IOC Intelligence</title>
 
     <style>
         * {
@@ -14,274 +14,222 @@
         body {
             margin: 0;
             background: #0b0f14;
-            color: #e6edf3;
-            font-family: Arial, sans-serif;
+            color: #d7dde5;
+            font-family: Consolas, "Courier New", monospace;
             font-size: 13px;
         }
 
+        .container {
+            width: min(1050px, 94%);
+            margin: 40px auto;
+        }
+
         header {
-            border-bottom: 1px solid #30363d;
-            padding: 18px 20px;
+            margin-bottom: 28px;
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-            letter-spacing: 3px;
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 1px;
         }
 
-        header p {
-            margin: 5px 0 0;
-            color: #8b949e;
+        .subtitle {
+            margin-top: 6px;
+            color: #7f8b99;
             font-size: 12px;
         }
 
-        main {
-            width: min(1100px, calc(100% - 30px));
-            margin: 25px auto 50px;
+        .panel {
+            background: #11161d;
+            border: 1px solid #202832;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 18px;
         }
 
-        h2 {
-            margin: 0 0 5px;
-            font-size: 18px;
-        }
-
-        .description {
-            color: #8b949e;
-            margin: 0 0 18px;
-            font-size: 12px;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 8px;
+        .panel-title {
+            color: #ffffff;
+            font-weight: bold;
             margin-bottom: 12px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
         }
 
         input {
             flex: 1;
             min-width: 0;
-            padding: 10px 12px;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 5px;
-            color: #e6edf3;
-            font-family: Consolas, monospace;
-            font-size: 12px;
+            background: #0b0f14;
+            border: 1px solid #2a333e;
+            color: #ffffff;
+            padding: 11px 12px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
             outline: none;
         }
 
         input:focus {
-            border-color: #58a6ff;
+            border-color: #536273;
         }
 
         button {
-            border: 1px solid #30363d;
-            border-radius: 5px;
-            padding: 9px 15px;
-            background: #238636;
-            color: white;
-            font-size: 12px;
+            background: #d7dde5;
+            color: #0b0f14;
+            border: none;
+            padding: 0 20px;
+            border-radius: 4px;
+            font-family: inherit;
             font-weight: bold;
             cursor: pointer;
         }
 
         button:hover {
-            background: #2ea043;
+            background: #ffffff;
         }
 
         button:disabled {
-            opacity: 0.55;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        #status {
-            min-height: 18px;
-            margin: 8px 0;
-            color: #8b949e;
-            font-size: 11px;
+        .status {
+            margin-top: 12px;
+            color: #7f8b99;
         }
 
-        .card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin-top: 10px;
+        .error {
+            color: #ff6b6b;
         }
 
-        .card-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding-bottom: 7px;
-            border-bottom: 1px solid #30363d;
-        }
-
-        .card-title h3 {
-            margin: 0;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .verdict-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 12px;
-        }
-
-        .verdict {
-            font-size: 19px;
-            font-weight: bold;
-        }
-
-        .malicious {
-            color: #ff7b72;
-        }
-
-        .warning {
-            color: #d29922;
-        }
-
-        .clean {
-            color: #3fb950;
-        }
-
-        .neutral {
-            color: #8b949e;
-        }
-
-        .detection {
-            color: #8b949e;
-            font-size: 11px;
-        }
-
-        .copy-btn {
-            padding: 6px 10px;
-            background: #21262d;
-            font-size: 11px;
-        }
-
-        .copy-btn:hover {
-            background: #30363d;
-        }
-
-        .report {
-            margin: 0;
-            padding: 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 4px;
-            color: #c9d1d9;
-            font-family: Consolas, Monaco, monospace;
-            font-size: 11px;
-            line-height: 1.45;
-            white-space: pre-wrap;
-            word-break: break-word;
-            overflow-x: auto;
+        .results {
+            display: none;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px 20px;
+            gap: 14px;
         }
 
-        .item {
+        .card {
+            background: #11161d;
+            border: 1px solid #202832;
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .card.full {
+            grid-column: 1 / -1;
+        }
+
+        .card-title {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #202832;
+        }
+
+        .field {
             display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            padding: 6px 0;
-            border-bottom: 1px solid #21262d;
-        }
-
-        .item:last-child {
-            border-bottom: none;
+            gap: 12px;
+            padding: 5px 0;
         }
 
         .label {
-            color: #8b949e;
-            font-size: 11px;
-            white-space: nowrap;
+            color: #7f8b99;
+            min-width: 125px;
         }
 
         .value {
-            color: #e6edf3;
-            text-align: right;
-            font-size: 11px;
+            color: #d7dde5;
             word-break: break-word;
         }
 
-        .hash-value {
-            font-family: Consolas, Monaco, monospace;
-            font-size: 10px;
+        .verdict-malicious {
+            color: #ff6b6b;
+            font-weight: bold;
         }
 
-        .link-value {
-            color: #58a6ff;
-            text-decoration: none;
+        .verdict-suspicious {
+            color: #f0c674;
+            font-weight: bold;
         }
 
-        .link-value:hover {
-            text-decoration: underline;
+        .verdict-clean {
+            color: #7bd88f;
+            font-weight: bold;
         }
 
-        .section-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             gap: 10px;
         }
 
-        .empty {
-            color: #8b949e;
+        .copy-button {
+            padding: 7px 12px;
             font-size: 11px;
-            margin: 0;
         }
 
-        footer {
-            border-top: 1px solid #30363d;
-            padding: 15px;
+        textarea {
+            width: 100%;
+            min-height: 430px;
+            resize: vertical;
+            background: #080b0f;
+            border: 1px solid #202832;
+            border-radius: 4px;
+            color: #cbd3dc;
+            padding: 14px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        .link {
+            color: #9fb3c8;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .link:hover {
+            color: #ffffff;
+        }
+
+        .footer {
+            margin-top: 25px;
+            color: #586472;
+            font-size: 11px;
             text-align: center;
-            color: #8b949e;
-            font-size: 10px;
         }
 
         @media (max-width: 700px) {
-
-            main {
-                width: calc(100% - 20px);
-                margin-top: 18px;
-            }
-
-            .search-box {
-                flex-direction: column;
-            }
-
-            .search-box button {
-                width: 100%;
-            }
-
-            .grid,
-            .section-grid {
+            .grid {
                 grid-template-columns: 1fr;
             }
 
-            .item {
-                align-items: flex-start;
+            .card.full {
+                grid-column: auto;
             }
 
-            .value {
-                text-align: right;
-            }
-
-            .verdict-row {
-                align-items: flex-start;
+            .input-row {
                 flex-direction: column;
+            }
+
+            button {
+                height: 40px;
+            }
+
+            .field {
+                flex-direction: column;
+                gap: 2px;
             }
         }
     </style>
@@ -289,721 +237,671 @@
 
 <body>
 
-<header>
-    <h1>ARGUS-RX</h1>
-    <p>Open Source Intelligence & Security Visibility</p>
-</header>
+<div class="container">
 
-<main>
+    <header>
+        <div class="brand">ARGUS-RX</div>
+        <div class="subtitle">
+            Open Source Intelligence &amp; Security Visibility
+        </div>
+    </header>
 
-    <h2>IOC Intelligence</h2>
+    <div class="panel">
+        <div class="panel-title">IOC Intelligence</div>
 
-    <p class="description">
-        Analyze file hashes using VirusTotal threat intelligence.
-    </p>
+        <div class="input-row">
+            <input
+                id="hashInput"
+                type="text"
+                placeholder="Enter MD5, SHA-1, or SHA-256 hash"
+                autocomplete="off"
+                spellcheck="false"
+            >
 
-    <div class="search-box">
+            <button id="analyzeButton" onclick="analyzeHash()">
+                Analyze
+            </button>
+        </div>
 
-        <input
-            id="hashInput"
-            type="text"
-            placeholder="Enter MD5, SHA-1, or SHA-256"
-            autocomplete="off"
-        >
-
-        <button
-            id="analyzeBtn"
-            onclick="analyzeHash()"
-        >
-            Analyze
-        </button>
-
+        <div id="status" class="status"></div>
     </div>
 
-    <div id="status"></div>
+    <div id="results" class="results">
 
-    <div id="results"></div>
+        <div class="grid">
 
-</main>
+            <!-- VERDICT -->
+            <div class="card full">
+                <div class="card-title">Analysis Verdict</div>
 
-<footer>
-    ARGUS-RX • Security Intelligence Platform
-</footer>
-
-
-<script>
-
-    // Cloudflare Worker
-    const WORKER_URL =
-        "https://argux-rxapi.sthing-ao.workers.dev";
-
-    let currentReport = "";
-
-
-    async function analyzeHash() {
-
-        const input =
-            document.getElementById("hashInput");
-
-        const button =
-            document.getElementById("analyzeBtn");
-
-        const status =
-            document.getElementById("status");
-
-        const results =
-            document.getElementById("results");
-
-        const hash =
-            input.value.trim();
-
-
-        if (!hash) {
-
-            status.textContent =
-                "Please enter a file hash.";
-
-            return;
-        }
-
-
-        if (
-            !/^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$/
-                .test(hash)
-        ) {
-
-            status.textContent =
-                "Invalid hash. Enter an MD5, SHA-1, or SHA-256 hash.";
-
-            return;
-        }
-
-
-        button.disabled = true;
-
-        status.textContent =
-            "Querying VirusTotal...";
-
-        results.innerHTML = "";
-
-
-        try {
-
-            const response = await fetch(
-                `${WORKER_URL}/?hash=${encodeURIComponent(hash)}`
-            );
-
-
-            const data =
-                await response.json();
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data.error?.message ||
-                    data.error ||
-                    "VirusTotal lookup failed."
-                );
-
-            }
-
-
-            if (
-                !data.data ||
-                !data.data.attributes
-            ) {
-
-                throw new Error(
-                    "Invalid response received from VirusTotal."
-                );
-
-            }
-
-
-            const attributes =
-                data.data.attributes;
-
-
-            const stats =
-                attributes.last_analysis_stats || {};
-
-
-            /*
-             * VirusTotal detection ratio:
-             *
-             * Include actual analysis results.
-             * Exclude type-unsupported because those engines
-             * did not provide a detection result.
-             */
-
-            const malicious =
-                stats.malicious || 0;
-
-            const suspicious =
-                stats.suspicious || 0;
-
-            const undetected =
-                stats.undetected || 0;
-
-            const harmless =
-                stats.harmless || 0;
-
-            const timeout =
-                stats.timeout || 0;
-
-            const unsupported =
-                stats["type-unsupported"] || 0;
-
-            const confirmedTimeout =
-                stats["confirmed-timeout"] || 0;
-
-            const failure =
-                stats.failure || 0;
-
-
-            const totalEngines =
-                malicious +
-                suspicious +
-                undetected +
-                harmless +
-                timeout +
-                confirmedTimeout +
-                failure;
-
-
-            let verdict =
-                "NO MALICIOUS DETECTIONS";
-
-            let verdictClass =
-                "clean";
-
-
-            if (malicious > 0) {
-
-                verdict =
-                    "MALICIOUS";
-
-                verdictClass =
-                    "malicious";
-
-            } else if (suspicious > 0) {
-
-                verdict =
-                    "SUSPICIOUS";
-
-                verdictClass =
-                    "warning";
-
-            }
-
-
-            const classification =
-                attributes.popular_threat_classification || {};
-
-
-            const threat =
-                classification.suggested_threat_label ||
-                "Unknown";
-
-
-            const category =
-                classification.category ||
-                "Unknown";
-
-
-            /*
-             * Signature information
-             */
-
-            const signature =
-                attributes.signature_info || {};
-
-
-            const product =
-                signature.product ||
-                "Unknown";
-
-
-            const version =
-                signature.version ||
-                signature.file_version ||
-                "Unknown";
-
-
-            const publisher =
-                signature.signers ||
-                signature.signer ||
-                signature.publisher ||
-                "Unknown";
-
-
-            let signatureStatus =
-                "Unknown";
-
-
-            if (
-                signature.valid === true ||
-                signature.verified === true
-            ) {
-
-                signatureStatus =
-                    "Valid";
-
-            } else if (
-                signature.valid === false ||
-                signature.verified === false
-            ) {
-
-                signatureStatus =
-                    "Invalid";
-
-            }
-
-
-            const meaningfulName =
-                attributes.meaningful_name ||
-                "Unknown";
-
-
-            const fileType =
-                attributes.type_description ||
-                "Unknown";
-
-
-            const fileSize =
-                formatBytes(attributes.size);
-
-
-            const submissions =
-                attributes.times_submitted ||
-                0;
-
-
-            const vtUrl =
-                `https://www.virustotal.com/gui/file/${encodeURIComponent(
-                    data.data.id
-                )}/detection`;
-
-
-            currentReport =
-                buildAnalystReport({
-
-                    verdict,
-                    malicious,
-                    suspicious,
-                    undetected,
-                    totalEngines,
-
-                    meaningfulName,
-                    fileType,
-                    threat,
-                    fileSize,
-
-                    attributes,
-                    submissions,
-
-                    category,
-                    product,
-                    version,
-
-                    signatureStatus,
-                    publisher,
-
-                    vtUrl
-
-                });
-
-
-            renderResults({
-
-                verdict,
-                verdictClass,
-
-                malicious,
-                suspicious,
-                undetected,
-                harmless,
-                timeout,
-                unsupported,
-
-                totalEngines,
-
-                meaningfulName,
-                fileType,
-                fileSize,
-
-                threat,
-                category,
-
-                product,
-                version,
-
-                signatureStatus,
-                publisher,
-
-                submissions,
-
-                vtUrl,
-
-                attributes
-
-            });
-
-
-            status.textContent =
-                "Analysis complete.";
-
-
-        } catch (error) {
-
-            console.error(
-                "ARGUS-RX error:",
-                error
-            );
-
-
-            status.textContent =
-                "Lookup failed.";
-
-
-            results.innerHTML = `
-
-                <div class="card">
-
-                    <div class="card-title">
-                        <h3>Error</h3>
-                    </div>
-
-                    <p class="malicious">
-                        ${escapeHTML(error.message)}
-                    </p>
-
+                <div class="field">
+                    <div class="label">Verdict</div>
+                    <div id="verdict" class="value"></div>
                 </div>
 
-            `;
+                <div class="field">
+                    <div class="label">Detection</div>
+                    <div id="detectionRatio" class="value"></div>
+                </div>
+            </div>
 
-        } finally {
+            <!-- FILE INFORMATION -->
+            <div class="card">
+                <div class="card-title">File Information</div>
 
-            button.disabled = false;
+                <div class="field">
+                    <div class="label">Name</div>
+                    <div id="fileName" class="value"></div>
+                </div>
 
-        }
+                <div class="field">
+                    <div class="label">Type</div>
+                    <div id="fileType" class="value"></div>
+                </div>
 
-    }
+                <div class="field">
+                    <div class="label">Threat</div>
+                    <div id="fileThreat" class="value"></div>
+                </div>
 
+                <div class="field">
+                    <div class="label">Size</div>
+                    <div id="fileSize" class="value"></div>
+                </div>
+            </div>
 
-    function renderResults(data) {
+            <!-- SIGNATURE INFORMATION -->
+            <div class="card">
+                <div class="card-title">Signature Information</div>
 
-        const results =
-            document.getElementById("results");
+                <div class="field">
+                    <div class="label">Status</div>
+                    <div id="signatureStatus" class="value"></div>
+                </div>
 
+                <div class="field">
+                    <div class="label">Publisher</div>
+                    <div id="publisher" class="value"></div>
+                </div>
+            </div>
 
-        const sandboxHTML =
-            buildSandboxHTML(
-                data.attributes.sandbox_verdicts
-            );
+            <!-- FILE DETAILS -->
+            <div class="card">
+                <div class="card-title">File Details</div>
 
+                <div class="field">
+                    <div class="label">Product</div>
+                    <div id="product" class="value"></div>
+                </div>
 
-        results.innerHTML = `
+                <div class="field">
+                    <div class="label">File Version</div>
+                    <div id="fileVersion" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Description</div>
+                    <div id="description" class="value"></div>
+                </div>
+            </div>
+
+            <!-- HASHES -->
+            <div class="card">
+                <div class="card-title">Hashes</div>
+
+                <div class="field">
+                    <div class="label">MD5</div>
+                    <div id="md5" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">SHA-1</div>
+                    <div id="sha1" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">SHA-256</div>
+                    <div id="sha256" class="value"></div>
+                </div>
+            </div>
+
+            <!-- DETECTION STATISTICS -->
+            <div class="card">
+                <div class="card-title">Detection Statistics</div>
+
+                <div class="field">
+                    <div class="label">Detection Ratio</div>
+                    <div id="statsRatio" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Malicious</div>
+                    <div id="malicious" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Suspicious</div>
+                    <div id="suspicious" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Undetected</div>
+                    <div id="undetected" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Harmless</div>
+                    <div id="harmless" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Timeout</div>
+                    <div id="timeout" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Unsupported</div>
+                    <div id="unsupported" class="value"></div>
+                </div>
+            </div>
+
+            <!-- THREAT INTELLIGENCE -->
+            <div class="card">
+                <div class="card-title">Threat Intelligence</div>
+
+                <div class="field">
+                    <div class="label">Category</div>
+                    <div id="category" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Suggested Label</div>
+                    <div id="suggestedLabel" class="value"></div>
+                </div>
+
+                <div class="field">
+                    <div class="label">VT Submissions</div>
+                    <div id="submissions" class="value"></div>
+                </div>
+            </div>
+
+            <!-- VIRUSTOTAL -->
+            <div class="card full">
+                <div class="card-title">VirusTotal</div>
+
+                <div class="field">
+                    <div class="label">Analysis</div>
+                    <div class="value">
+                        <a id="vtLink" class="link" href="#" target="_blank" rel="noopener noreferrer">
+                            Open VirusTotal
+                        </a>
+                    </div>
+                </div>
+            </div>
 
             <!-- COPYABLE REPORT -->
-
-            <div class="card">
-
-                <div class="verdict-row">
-
-                    <div>
-
-                        <div class="label">
-                            ARGUS-RX VERDICT
-                        </div>
-
-                        <div class="verdict ${data.verdictClass}">
-                            ${escapeHTML(data.verdict)}
-                        </div>
-
-                    </div>
-
-                    <div class="detection">
-                        Detection:
-                        ${data.malicious} malicious /
-                        ${data.suspicious} suspicious /
-                        ${data.undetected} undetected
-                    </div>
-
-                </div>
-
-
-                <div class="card-title">
-
-                    <h3>
-                        Copyable Analyst Report
-                    </h3>
+            <div class="card full">
+                <div class="report-header">
+                    <div class="card-title">Analyst Report</div>
 
                     <button
-                        class="copy-btn"
+                        id="copyButton"
+                        class="copy-button"
                         onclick="copyReport()"
                     >
                         Copy Report
                     </button>
-
                 </div>
 
-
-                <pre
-                    class="report"
-                    id="analystReport"
-                >${escapeHTML(currentReport)}</pre>
-
+                <textarea id="report" readonly></textarea>
             </div>
 
+        </div>
+    </div>
 
-            <!-- FILE -->
+    <div class="footer">
+        ARGUS-RX &mdash; Open Source Intelligence &amp; Security Visibility
+    </div>
 
-            <div class="card">
+</div>
 
-                <div class="card-title">
-                    <h3>File Information</h3>
-                </div>
+<script>
 
-                <div class="grid">
+const WORKER_URL = "https://argux-rxapi.sthing-ao.workers.dev";
 
-                    ${infoItem(
-                        "Name",
-                        data.meaningfulName
-                    )}
+let currentReport = "";
 
-                    ${infoItem(
-                        "Type",
-                        data.fileType
-                    )}
 
-                    ${infoItem(
-                        "Threat",
-                        data.threat
-                    )}
+/* ==============================
+   HASH ANALYSIS
+   ============================== */
 
-                    ${infoItem(
-                        "Size",
-                        data.fileSize
-                    )}
+async function analyzeHash() {
 
-                    ${infoItem(
-                        "VT Submissions",
-                        data.submissions
-                    )}
+    const input = document.getElementById("hashInput");
+    const button = document.getElementById("analyzeButton");
+    const status = document.getElementById("status");
+    const results = document.getElementById("results");
 
-                </div>
+    const hash = input.value.trim();
 
-            </div>
+    if (!hash) {
+        status.textContent = "Please enter a hash.";
+        status.className = "status error";
+        return;
+    }
 
+    if (!/^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$/.test(hash)) {
+        status.textContent = "Invalid hash. Enter an MD5, SHA-1, or SHA-256 hash.";
+        status.className = "status error";
+        results.style.display = "none";
+        return;
+    }
 
-            <!-- SIGNATURE -->
+    button.disabled = true;
+    button.textContent = "Analyzing...";
 
-            <div class="card">
+    status.textContent = "Querying VirusTotal...";
+    status.className = "status";
 
-                <div class="card-title">
-                    <h3>Signature Information</h3>
-                </div>
+    results.style.display = "none";
 
-                <div class="grid">
+    try {
 
-                    ${infoItem(
-                        "Status",
-                        data.signatureStatus
-                    )}
+        const response = await fetch(
+            `${WORKER_URL}/?hash=${encodeURIComponent(hash)}`
+        );
 
-                    ${infoItem(
-                        "Publisher",
-                        data.publisher
-                    )}
+        const data = await response.json();
 
-                    ${infoItem(
-                        "Product",
-                        data.product
-                    )}
+        if (!response.ok) {
 
-                    ${infoItem(
-                        "Version",
-                        data.version
-                    )}
+            const message =
+                data?.error?.message ||
+                data?.error ||
+                `VirusTotal request failed (${response.status})`;
 
-                </div>
+            throw new Error(message);
+        }
 
-            </div>
+        if (!data.data || !data.data.attributes) {
+            throw new Error("Unexpected VirusTotal response.");
+        }
 
+        const attributes = data.data.attributes;
 
-            <!-- HASHES -->
 
-            <div class="card">
+        /* ==============================
+           DETECTION STATISTICS
+           ============================== */
 
-                <div class="card-title">
-                    <h3>Hashes</h3>
-                </div>
+        const stats = attributes.last_analysis_stats || {};
 
-                <div class="grid">
+        const malicious = stats.malicious || 0;
+        const suspicious = stats.suspicious || 0;
+        const undetected = stats.undetected || 0;
+        const harmless = stats.harmless || 0;
+        const timeout = stats.timeout || 0;
+        const unsupported = stats["type-unsupported"] || 0;
+        const confirmedTimeout = stats["confirmed-timeout"] || 0;
+        const failure = stats.failure || 0;
 
-                    ${hashItem(
-                        "MD5",
-                        data.attributes.md5
-                    )}
+        /*
+         * VirusTotal's displayed detection ratio excludes
+         * type-unsupported engines.
+         */
+        const totalEngines =
+            malicious +
+            suspicious +
+            undetected +
+            harmless +
+            timeout +
+            confirmedTimeout +
+            failure;
+
+
+        /* ==============================
+           VERDICT
+           ============================== */
+
+        let verdict = "CLEAN";
+
+        if (malicious > 0) {
+            verdict = "MALICIOUS";
+        } else if (suspicious > 0) {
+            verdict = "SUSPICIOUS";
+        }
+
+
+        /* ==============================
+           THREAT CLASSIFICATION
+           ============================== */
+
+        const classification =
+            attributes.popular_threat_classification || {};
 
-                    ${hashItem(
-                        "SHA-1",
-                        data.attributes.sha1
-                    )}
+        const threat =
+            classification.suggested_threat_label ||
+            "Unknown";
 
-                    ${hashItem(
-                        "SHA-256",
-                        data.attributes.sha256
-                    )}
+        const category =
+            classification.category ||
+            "Unknown";
 
-                </div>
 
-            </div>
+        /* ==============================
+           SIGNATURE INFORMATION
+           ============================== */
 
+        const signature =
+            attributes.signature_info || {};
 
-            <!-- DETECTION STATISTICS -->
-
-            <div class="card">
-
-                <div class="card-title">
-                    <h3>Detection Statistics</h3>
-                </div>
-
-                <div class="grid">
-
-                    ${infoItem(
-                        "Detection Ratio",
-                        `${data.malicious} / ${data.totalEngines}`
-                    )}
-
-                    ${infoItem(
-                        "Malicious",
-                        data.malicious,
-                        "malicious"
-                    )}
-
-                    ${infoItem(
-                        "Suspicious",
-                        data.suspicious,
-                        "warning"
-                    )}
-
-                    ${infoItem(
-                        "Undetected",
-                        data.undetected
-                    )}
-
-                    ${infoItem(
-                        "Harmless",
-                        data.harmless
-                    )}
-
-                    ${infoItem(
-                        "Timeout",
-                        data.timeout
-                    )}
-
-                    ${infoItem(
-                        "Unsupported",
-                        data.unsupported
-                    )}
-
-                </div>
-
-            </div>
-
-
-            <!-- THREAT INTELLIGENCE -->
-
-            <div class="card">
-
-                <div class="card-title">
-                    <h3>Threat Intelligence</h3>
-                </div>
-
-                <div class="grid">
-
-                    ${infoItem(
-                        "Category",
-                        data.category
-                    )}
-
-                    ${infoItem(
-                        "Suggested Label",
-                        data.threat
-                    )}
-
-                </div>
-
-            </div>
-
-
-            <!-- SANDBOX -->
-
-            <div class="card">
-
-                <div class="card-title">
-                    <h3>Sandbox Intelligence</h3>
-                </div>
-
-                <div class="section-grid">
-
-                    ${sandboxHTML}
-
-                </div>
-
-            </div>
-
-
-            <!-- VIRUSTOTAL -->
-
-            <div class="card">
-
-                <div class="card-title">
-                    <h3>VirusTotal</h3>
-                </div>
-
-                <div class="grid">
-
-                    <div class="item">
-
-                        <span class="label">
-                            Report
-                        </span>
-
-                        <span class="value">
-
-                            <a
-                                class="link-value"
-                                href="${escapeHTML(data.vtUrl)}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Open Detection Report
-                            </a>
-
-                        </span>
-
-                    </div>
-
-                    ${infoItem(
-                        "Source",
-                        "VirusTotal"
-                    )}
-
-                </div>
-
-            </div>
-
-        `;
+        /*
+         * VirusTotal uses the following signature_info
+         * property names:
+         *
+         * product
+         * file version
+         * description
+         * signers
+         */
+
+        const product =
+            signature["product"] ||
+            "Unknown";
+
+        const fileVersion =
+            signature["file version"] ||
+            signature["file_version"] ||
+            "Unknown";
+
+        const description =
+            signature["description"] ||
+            "Unknown";
+
+        const publisher =
+            signature["signers"] ||
+            signature["signer"] ||
+            signature["publisher"] ||
+            "Unknown";
+
+
+        /*
+         * Determine signing state.
+         *
+         * VT may expose signer/certificate information
+         * when a file is signed. If there is explicit
+         * verification information, use that first.
+         */
+
+        let signatureStatus = "Not Signed";
+
+        if (
+            signature["verified"] === true ||
+            signature["valid"] === true
+        ) {
+            signatureStatus = "Signed & Verified";
+
+        } else if (
+            signature["verified"] === false ||
+            signature["valid"] === false
+        ) {
+            signatureStatus = "Signed / Invalid";
+
+        } else if (
+            signature["signers"] ||
+            signature["signer"] ||
+            signature["certificate"] ||
+            signature["certificates"] ||
+            signature["x509"]
+        ) {
+            signatureStatus = "Signed";
+        }
+
+
+        /* ==============================
+           FILE INFORMATION
+           ============================== */
+
+        const meaningfulName =
+            attributes.meaningful_name ||
+            "Unknown";
+
+        const fileType =
+            attributes.type_description ||
+            "Unknown";
+
+        const fileSize =
+            formatBytes(attributes.size);
+
+        const submissions =
+            attributes.times_submitted || 0;
+
+
+        /* ==============================
+           VIRUSTOTAL URL
+           ============================== */
+
+        const vtId = data.data.id || hash;
+
+        const vtUrl =
+            `https://www.virustotal.com/gui/file/${encodeURIComponent(vtId)}/detection`;
+
+
+        /* ==============================
+           BUILD REPORT
+           ============================== */
+
+        currentReport = buildAnalystReport({
+            verdict,
+            malicious,
+            totalEngines,
+            meaningfulName,
+            fileType,
+            threat,
+            fileSize,
+            signatureStatus,
+            publisher,
+            product,
+            fileVersion,
+            description,
+            attributes,
+            category,
+            submissions,
+            vtUrl,
+            suspicious,
+            undetected,
+            harmless,
+            timeout,
+            unsupported
+        });
+
+
+        /* ==============================
+           RENDER RESULTS
+           ============================== */
+
+        renderResults({
+            verdict,
+            malicious,
+            suspicious,
+            undetected,
+            harmless,
+            timeout,
+            unsupported,
+            totalEngines,
+            meaningfulName,
+            fileType,
+            threat,
+            fileSize,
+            signatureStatus,
+            publisher,
+            product,
+            fileVersion,
+            description,
+            attributes,
+            category,
+            submissions,
+            vtUrl
+        });
+
+        results.style.display = "block";
+
+        status.textContent = "Analysis complete.";
+        status.className = "status";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            `Lookup failed: ${error.message}`;
+
+        status.className = "status error";
+
+        results.style.display = "none";
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Analyze";
+    }
+}
+
+
+/* ==============================
+   RENDER RESULTS
+   ============================== */
+
+function renderResults(data) {
+
+    const verdictElement =
+        document.getElementById("verdict");
+
+    verdictElement.textContent =
+        data.verdict;
+
+    verdictElement.className = "value";
+
+    if (data.verdict === "MALICIOUS") {
+        verdictElement.classList.add("verdict-malicious");
+
+    } else if (data.verdict === "SUSPICIOUS") {
+        verdictElement.classList.add("verdict-suspicious");
+
+    } else {
+        verdictElement.classList.add("verdict-clean");
     }
 
 
-    function buildAnalystReport(data) {
+    document.getElementById("detectionRatio").textContent =
+        `${data.malicious} / ${data.totalEngines} ENGINES`;
 
-        return `================================
+    document.getElementById("fileName").textContent =
+        data.meaningfulName;
+
+    document.getElementById("fileType").textContent =
+        data.fileType;
+
+    document.getElementById("fileThreat").textContent =
+        data.threat;
+
+    document.getElementById("fileSize").textContent =
+        data.fileSize;
+
+
+    /* SIGNATURE */
+
+    document.getElementById("signatureStatus").textContent =
+        data.signatureStatus;
+
+    document.getElementById("publisher").textContent =
+        data.publisher;
+
+
+    /* FILE DETAILS */
+
+    document.getElementById("product").textContent =
+        data.product;
+
+    document.getElementById("fileVersion").textContent =
+        data.fileVersion;
+
+    document.getElementById("description").textContent =
+        data.description;
+
+
+    /* HASHES */
+
+    document.getElementById("md5").textContent =
+        data.attributes.md5 || "Unknown";
+
+    document.getElementById("sha1").textContent =
+        data.attributes.sha1 || "Unknown";
+
+    document.getElementById("sha256").textContent =
+        data.attributes.sha256 || "Unknown";
+
+
+    /* DETECTION STATISTICS */
+
+    document.getElementById("statsRatio").textContent =
+        `${data.malicious} / ${data.totalEngines}`;
+
+    document.getElementById("malicious").textContent =
+        data.malicious;
+
+    document.getElementById("suspicious").textContent =
+        data.suspicious;
+
+    document.getElementById("undetected").textContent =
+        data.undetected;
+
+    document.getElementById("harmless").textContent =
+        data.harmless;
+
+    document.getElementById("timeout").textContent =
+        data.timeout;
+
+    document.getElementById("unsupported").textContent =
+        data.unsupported;
+
+
+    /* THREAT INTELLIGENCE */
+
+    document.getElementById("category").textContent =
+        data.category;
+
+    document.getElementById("suggestedLabel").textContent =
+        data.threat;
+
+    document.getElementById("submissions").textContent =
+        data.submissions;
+
+
+    /* VIRUSTOTAL */
+
+    const vtLink =
+        document.getElementById("vtLink");
+
+    vtLink.href = data.vtUrl;
+
+
+    /* REPORT */
+
+    document.getElementById("report").value =
+        currentReport;
+}
+
+
+/* ==============================
+   ANALYST REPORT
+   ============================== */
+
+function buildAnalystReport(data) {
+
+    return `================================
        VIRUSTOTAL SUMMARY
 ================================
 
@@ -1019,6 +917,11 @@ Size: ${data.fileSize}
 SIGNATURE INFORMATION
 Status: ${data.signatureStatus}
 Publisher: ${data.publisher}
+
+FILE DETAILS
+Product: ${data.product}
+File Version: ${data.fileVersion}
+Description: ${data.description}
 
 HASHES
 MD5: ${data.attributes.md5 || "Unknown"}
@@ -1040,244 +943,101 @@ Suggested Label: ${data.threat}
 DETECTION STATISTICS
 Malicious: ${data.malicious}
 Suspicious: ${data.suspicious}
-Undetected: ${data.undetected}`;
+Undetected: ${data.undetected}
+Harmless: ${data.harmless}
+Timeout: ${data.timeout}
+Unsupported: ${data.unsupported}`;
+}
+
+
+/* ==============================
+   FORMAT FILE SIZE
+   ============================== */
+
+function formatBytes(bytes) {
+
+    if (!bytes || isNaN(bytes)) {
+        return "Unknown";
     }
 
+    const units = [
+        "Bytes",
+        "KB",
+        "MB",
+        "GB"
+    ];
 
-    async function copyReport() {
+    let size = Number(bytes);
+    let index = 0;
 
-        if (!currentReport) {
-            return;
-        }
-
-
-        try {
-
-            await navigator.clipboard.writeText(
-                currentReport
-            );
-
-
-            const button =
-                document.querySelector(".copy-btn");
-
-
-            if (button) {
-
-                const original =
-                    button.textContent;
-
-                button.textContent =
-                    "Copied";
-
-                setTimeout(() => {
-
-                    button.textContent =
-                        original;
-
-                }, 1500);
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Copy failed:",
-                error
-            );
-
-        }
-
+    while (size >= 1024 && index < units.length - 1) {
+        size /= 1024;
+        index++;
     }
 
+    return `${size.toFixed(2)} ${units[index]}`;
+}
 
-    function infoItem(
-        label,
-        value,
-        className = ""
-    ) {
 
-        return `
+/* ==============================
+   COPY REPORT
+   ============================== */
 
-            <div class="item">
+async function copyReport() {
 
-                <span class="label">
-                    ${escapeHTML(label)}
-                </span>
+    const report =
+        document.getElementById("report").value;
 
-                <span class="value ${className}">
-                    ${escapeHTML(
-                        value ?? "Unknown"
-                    )}
-                </span>
+    const button =
+        document.getElementById("copyButton");
 
-            </div>
+    try {
 
-        `;
+        await navigator.clipboard.writeText(report);
+
+        const originalText =
+            button.textContent;
+
+        button.textContent =
+            "Copied";
+
+        setTimeout(() => {
+            button.textContent =
+                originalText;
+        }, 1500);
+
+    } catch (error) {
+
+        const textarea =
+            document.getElementById("report");
+
+        textarea.select();
+        document.execCommand("copy");
+
+        button.textContent =
+            "Copied";
+
+        setTimeout(() => {
+            button.textContent =
+                "Copy Report";
+        }, 1500);
     }
+}
 
 
-    function hashItem(
-        label,
-        value
-    ) {
+/* ==============================
+   ENTER KEY
+   ============================== */
 
-        return `
+document
+    .getElementById("hashInput")
+    .addEventListener("keydown", function(event) {
 
-            <div class="item">
-
-                <span class="label">
-                    ${escapeHTML(label)}
-                </span>
-
-                <span class="value hash-value">
-                    ${escapeHTML(
-                        value || "Unknown"
-                    )}
-                </span>
-
-            </div>
-
-        `;
-    }
-
-
-    function buildSandboxHTML(
-        sandboxVerdicts
-    ) {
-
-        if (!sandboxVerdicts) {
-
-            return `
-                <p class="empty">
-                    No sandbox verdict information available.
-                </p>
-            `;
-
+        if (event.key === "Enter") {
+            analyzeHash();
         }
 
-
-        const entries =
-            Object.entries(
-                sandboxVerdicts
-            );
-
-
-        if (!entries.length) {
-
-            return `
-                <p class="empty">
-                    No sandbox verdict information available.
-                </p>
-            `;
-
-        }
-
-
-        return entries.map(
-            ([name, data]) => {
-
-                const verdict =
-                    data?.verdict ||
-                    "Unknown";
-
-                const confidence =
-                    data?.confidence !== undefined
-                        ? ` (${data.confidence}% confidence)`
-                        : "";
-
-
-                return `
-
-                    <div class="item">
-
-                        <span class="label">
-                            ${escapeHTML(name)}
-                        </span>
-
-                        <span class="value">
-                            ${escapeHTML(verdict)}
-                            ${escapeHTML(confidence)}
-                        </span>
-
-                    </div>
-
-                `;
-
-            }
-        ).join("");
-
-    }
-
-
-    function formatBytes(bytes) {
-
-        if (
-            bytes === null ||
-            bytes === undefined ||
-            bytes === 0
-        ) {
-            return "Unknown";
-        }
-
-
-        const units =
-            ["B", "KB", "MB", "GB"];
-
-
-        let i = 0;
-
-
-        while (
-            bytes >= 1024 &&
-            i < units.length - 1
-        ) {
-
-            bytes /= 1024;
-            i++;
-
-        }
-
-
-        return `${bytes.toFixed(2)} ${units[i]}`;
-
-    }
-
-
-    function escapeHTML(value) {
-
-        if (
-            value === null ||
-            value === undefined
-        ) {
-
-            return "";
-
-        }
-
-
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-    }
-
-
-    document
-        .getElementById("hashInput")
-        .addEventListener(
-            "keydown",
-            function(event) {
-
-                if (event.key === "Enter") {
-                    analyzeHash();
-                }
-
-            }
-        );
+    });
 
 </script>
 
