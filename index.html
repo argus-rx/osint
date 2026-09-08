@@ -13,8 +13,8 @@
 
         body {
             margin: 0;
-            background: #0b0f14;
-            color: #d7dde5;
+            background: #0a0a0a;
+            color: #d6d6d6;
             font-family: Consolas, "Courier New", monospace;
             font-size: 13px;
         }
@@ -31,26 +31,26 @@
         .brand {
             font-size: 24px;
             font-weight: bold;
-            color: #ffffff;
+            color: #ff7a00;
             letter-spacing: 1px;
         }
 
         .subtitle {
             margin-top: 6px;
-            color: #7f8b99;
+            color: #777777;
             font-size: 12px;
         }
 
         .panel {
-            background: #11161d;
-            border: 1px solid #202832;
+            background: #111111;
+            border: 1px solid #292929;
             border-radius: 6px;
             padding: 18px;
             margin-bottom: 18px;
         }
 
         .panel-title {
-            color: #ffffff;
+            color: #f0f0f0;
             font-weight: bold;
             margin-bottom: 12px;
         }
@@ -63,8 +63,8 @@
         input {
             flex: 1;
             min-width: 0;
-            background: #0b0f14;
-            border: 1px solid #2a333e;
+            background: #0a0a0a;
+            border: 1px solid #303030;
             color: #ffffff;
             padding: 11px 12px;
             border-radius: 4px;
@@ -74,12 +74,13 @@
         }
 
         input:focus {
-            border-color: #536273;
+            border-color: #ff7a00;
+            box-shadow: 0 0 0 1px rgba(255, 122, 0, 0.15);
         }
 
         button {
-            background: #d7dde5;
-            color: #0b0f14;
+            background: #ff7a00;
+            color: #0a0a0a;
             border: none;
             padding: 0 20px;
             border-radius: 4px;
@@ -89,7 +90,7 @@
         }
 
         button:hover {
-            background: #ffffff;
+            background: #ff8c1a;
         }
 
         button:disabled {
@@ -99,11 +100,11 @@
 
         .status {
             margin-top: 12px;
-            color: #7f8b99;
+            color: #777777;
         }
 
         .error {
-            color: #ff6b6b;
+            color: #ff5c5c;
         }
 
         .results {
@@ -117,8 +118,8 @@
         }
 
         .card {
-            background: #11161d;
-            border: 1px solid #202832;
+            background: #111111;
+            border: 1px solid #292929;
             border-radius: 6px;
             padding: 16px;
         }
@@ -128,11 +129,11 @@
         }
 
         .card-title {
-            color: #ffffff;
+            color: #f0f0f0;
             font-weight: bold;
             margin-bottom: 12px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #202832;
+            border-bottom: 1px solid #292929;
         }
 
         .field {
@@ -142,22 +143,22 @@
         }
 
         .label {
-            color: #7f8b99;
+            color: #777777;
             min-width: 125px;
         }
 
         .value {
-            color: #d7dde5;
+            color: #d6d6d6;
             word-break: break-word;
         }
 
         .verdict-malicious {
-            color: #ff6b6b;
+            color: #ff7a00;
             font-weight: bold;
         }
 
         .verdict-suspicious {
-            color: #f0c674;
+            color: #ffb347;
             font-weight: bold;
         }
 
@@ -182,10 +183,10 @@
             width: 100%;
             min-height: 430px;
             resize: vertical;
-            background: #080b0f;
-            border: 1px solid #202832;
+            background: #090909;
+            border: 1px solid #292929;
             border-radius: 4px;
-            color: #cbd3dc;
+            color: #c7c7c7;
             padding: 14px;
             font-family: Consolas, "Courier New", monospace;
             font-size: 12px;
@@ -193,19 +194,23 @@
             outline: none;
         }
 
+        textarea:focus {
+            border-color: #ff7a00;
+        }
+
         .link {
-            color: #9fb3c8;
+            color: #ff8c1a;
             text-decoration: none;
             word-break: break-all;
         }
 
         .link:hover {
-            color: #ffffff;
+            color: #ffb347;
         }
 
         .footer {
             margin-top: 25px;
-            color: #586472;
+            color: #555555;
             font-size: 11px;
             text-align: center;
         }
@@ -439,7 +444,7 @@
                 </div>
             </div>
 
-            <!-- COPYABLE REPORT -->
+            <!-- ANALYST REPORT -->
             <div class="card full">
                 <div class="report-header">
                     <div class="card-title">Analyst Report</div>
@@ -596,16 +601,6 @@ async function analyzeHash() {
         const signature =
             attributes.signature_info || {};
 
-        /*
-         * VirusTotal uses the following signature_info
-         * property names:
-         *
-         * product
-         * file version
-         * description
-         * signers
-         */
-
         const product =
             signature["product"] ||
             "Unknown";
@@ -625,14 +620,6 @@ async function analyzeHash() {
             signature["publisher"] ||
             "Unknown";
 
-
-        /*
-         * Determine signing state.
-         *
-         * VT may expose signer/certificate information
-         * when a file is signed. If there is explicit
-         * verification information, use that first.
-         */
 
         let signatureStatus = "Not Signed";
 
